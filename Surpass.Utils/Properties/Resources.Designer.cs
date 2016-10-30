@@ -88,11 +88,74 @@ namespace Surpass.Utils.Properties {
         }
         
         /// <summary>
+        ///   查找类似 类型 {0} 不是基本类型时，必须是类类型。 的本地化字符串。
+        /// </summary>
+        internal static string NotBaseTypeNotEqualClass {
+            get {
+                return ResourceManager.GetString("NotBaseTypeNotEqualClass", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 类型 {0} 不是基本类型。 的本地化字符串。
+        /// </summary>
+        internal static string NotEqualBaseType {
+            get {
+                return ResourceManager.GetString("NotEqualBaseType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 类型 {0} 必须是类或接口类型才能支持实例委托。 的本地化字符串。
+        /// </summary>
+        internal static string NotEqualClassOrInterfaceNotSupportedDelegate {
+            get {
+                return ResourceManager.GetString("NotEqualClassOrInterfaceNotSupportedDelegate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 不支持的表达式 {0}。 的本地化字符串。
+        /// </summary>
+        internal static string NotSupportedExpression {
+            get {
+                return ResourceManager.GetString("NotSupportedExpression", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 不支持的类型 {0}。 的本地化字符串。
+        /// </summary>
+        internal static string NotSupportedType {
+            get {
+                return ResourceManager.GetString("NotSupportedType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 只读字典不支持 {0} 操作。 的本地化字符串。
         /// </summary>
         internal static string ReadOnlyNotSupportedOperation {
             get {
                 return ResourceManager.GetString("ReadOnlyNotSupportedOperation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 类型 {0} 无默认的公共构造函数。 的本地化字符串。
+        /// </summary>
+        internal static string TypeNotDefaultConstructor {
+            get {
+                return ResourceManager.GetString("TypeNotDefaultConstructor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 类型 {0} 不是类型 {1} 的实例分配。 的本地化字符串。
+        /// </summary>
+        internal static string TypeNotTypeAssignableFrom {
+            get {
+                return ResourceManager.GetString("TypeNotTypeAssignableFrom", resourceCulture);
             }
         }
         

@@ -6,7 +6,7 @@ namespace Surpass.Utils.Collections
     /// <summary>
     /// 字典调试视图
     /// </summary>
-    internal class DictionaryDebugView<K, V>
+    public class DictionaryDebugView<K, V>
     {
         private IDictionary<K, V> dict;
 
@@ -24,7 +24,7 @@ namespace Surpass.Utils.Collections
         }
 
         /// <summary>
-        /// 
+        /// 获取项目集合
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
         public KeyValuePair<K, V>[] Items
