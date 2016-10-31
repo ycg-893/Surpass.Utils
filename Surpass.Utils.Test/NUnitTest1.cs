@@ -9,6 +9,7 @@ namespace Surpass.Utils.Test
         [Test]
         public void TestMethod1()
         {
+            System.Net.WebClient client;
         }
     }
 }
