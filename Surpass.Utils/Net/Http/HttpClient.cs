@@ -147,7 +147,7 @@ namespace Surpass.Utils.Net.Http
                         }
                         builder.Append(keyValue.Key);
                         builder.Append("=");
-                        //builder.Append(isUrlEncode ? System.Web.HttpUtility.UrlEncode(keyValue.Value) : keyValue.Value);
+                        builder.Append(isUrlEncode ? UrlEncoderUtils.UrlEncode(keyValue.Value, this.Encoding) : keyValue.Value);
                         count++;
                     }
                 }
