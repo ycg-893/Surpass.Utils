@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -21,37 +22,8 @@ namespace Surpass.Utils.Reflection.Meta
         protected MetaMember(MemberInfo memberInfo)
         {
             this.MemberInfo = ExceptionUtils.CheckNotNull(memberInfo, nameof(memberInfo));
-            List<Attribute> atts = new List<Attribute>();
-            List<ValidationAttribute> vatts = new List<ValidationAttribute>();
-            var customs = this.MemberInfo.GetCustomAttributes(true);
-            DisplayAttribute displayAttribute = null;
-            if (customs != null)
-            {
-                foreach (var item in customs)
-                {
-                    atts.Add((Attribute)item);
-                    if (item is ValidationAttribute)
-                    {
-                        vatts.Add((ValidationAttribute)item);
-                    }
-                    else if(item is DisplayAttribute)
-                    {
-                        displayAttribute = (DisplayAttribute)item;
-                    }
-                }
-            }
-            if (memberInfo is PropertyInfo)
-            {
-                this.MemberType = ((PropertyInfo)memberInfo).PropertyType;                
-            }
-            else
-            {
-                this.MemberType = ((FieldInfo)memberInfo).FieldType;              
-            }
-            this.IsBaseTypeMember = TypeExtension.IsBaseTypeOrNullableDefinitionBaseTType(this.MemberType);
-            this.CustomAttributes = atts.AsReadOnly();
-            this.ValidationAttributes = vatts.AsReadOnly();
-            this.DisplayAttribute = displayAttribute;
+            this.ReturnType = memberInfo.GetMemberType();
+            this.IsReturnBaseType = TypeExtension.IsBaseTypeOrNullableDefinitionBaseType(this.ReturnType);
         }
 
         /// <summary>
@@ -60,54 +32,68 @@ namespace Surpass.Utils.Reflection.Meta
         public MemberInfo MemberInfo { get; private set; }
 
         /// <summary>
+        /// 获取返回类型
+        /// </summary>
+        public Type ReturnType { get; private set; }
+
+        /// <summary>
+        /// 获取是否返回基本类型
+        /// </summary>
+        public bool IsReturnBaseType { get; private set; }
+
+        /// <summary>
         /// 获取成员类型
         /// </summary>
-        public Type MemberType { get; private set; }
+        public abstract MemberType MemberType { get; }
 
         /// <summary>
-        /// 获取是否是基本类型成员(即支持直接转换)
+        /// 获取引用字段值
         /// </summary>
-        public bool IsBaseTypeMember { get; private set; }
+        /// <typeparam name="TRefField">字段类型</typeparam>
+        /// <param name="refField">字段</param>
+        /// <param name="createRefField">创建字段</param>
+        /// <returns></returns>
+        protected TRefField GetRefField<TRefField>(ref TRefField refField, Func<TRefField> createRefField)
+            where TRefField : class
+        {
+            if (refField == null)
+            {
+                lock (this)
+                {
+                    if (refField == null)
+                    {
+                        refField = createRefField();
+                    }
+                }
+            }
+            return refField;
+        }
 
-        /// <summary>
-        /// 获取是否是属性
-        /// </summary>
-        public abstract bool IsProperty { get; }     
-        
-        /// <summary>
-        /// 获取是否允许读
-        /// </summary>
-        public abstract bool CanRead { get; }
-
-        /// <summary>
-        /// 获取是否允许写
-        /// </summary>
-        public abstract bool CanWrite { get; }
-
-        /// <summary>
-        /// 获取成员值
-        /// </summary>
-        public abstract Func<object, object> GetMemberValue { get; }
-
-        /// <summary>
-        /// 设置成员值
-        /// </summary>
-        public abstract Action<object, object> SetMemberValue { get; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private IList<Attribute> customAttributes = null;
 
         /// <summary>
         /// 获取自定义特性集合
         /// </summary>
-        public IList<Attribute> CustomAttributes { get; private set; }
-
-        /// <summary>
-        /// 获取验证特性集合
-        /// </summary>
-        public IList<ValidationAttribute> ValidationAttributes { get; private set; }
-
-        /// <summary>
-        /// 获取友好特性
-        /// </summary>
-        public DisplayAttribute DisplayAttribute { get; private set; }
+        public IList<Attribute> CustomAttributes
+        {
+            get
+            {
+                return this.GetRefField<IList<Attribute>>(ref this.customAttributes, () =>
+                     {
+                         List<Attribute> atts = new List<Attribute>();
+                         var customs = this.MemberInfo.GetCustomAttributes(true);
+                         if (customs != null)
+                         {
+                             foreach (var item in customs)
+                             {
+                                 atts.Add((Attribute)item);
+                             }
+                         }
+                         return atts.AsReadOnly();
+                     });
+            }
+        }
 
         /// <summary>
         /// 输出成员名称
@@ -124,9 +110,32 @@ namespace Surpass.Utils.Reflection.Meta
         public virtual void Dispose()
         {
             this.MemberInfo = null;
-            this.MemberType = null;
-            this.CustomAttributes = null;
-            this.ValidationAttributes = null;
+            this.ReturnType = null;
+            this.CustomAttributes.Clear();
+            this.customAttributes = null;
         }
+    }
+
+    /// <summary>
+    /// 成员类型
+    /// </summary>
+    public enum MemberType
+    {
+        /// <summary>
+        /// 属性
+        /// </summary>
+        Property,
+        /// <summary>
+        /// 字段
+        /// </summary>
+        Field,
+        /// <summary>
+        /// 方法
+        /// </summary>
+        Method,
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        Constructor
     }
 }

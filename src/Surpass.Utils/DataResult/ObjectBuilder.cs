@@ -153,7 +153,7 @@ namespace Surpass.Utils.DataResult
         /// <returns></returns>
         private MemberAssignment ObjectMemberAssignment(Type memberType, MemberInfo member, HashSet<Type> RepeatTypes)
         {
-            if (memberType.IsBaseTypeOrNullableDefinitionBaseTType()) //基本类型
+            if (memberType.IsBaseTypeOrNullableDefinitionBaseType()) //基本类型
             {
                 var value = this.ScalarExpressionBody(memberType, member.Name);
                 return Expression.Bind(member, value);

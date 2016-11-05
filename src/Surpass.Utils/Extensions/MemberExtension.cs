@@ -34,9 +34,9 @@ namespace Surpass.Utils
             }
             if (member is ConstructorInfo)
             {
-                return null;
+                return typeof(void);
             }
-            throw new ArgumentException("不支持的成员类型" + member.ToString(), nameof(member));
+            throw new NotSupportedException("不支持的成员类型 " + member.ToString());
         }
 
         /// <summary>

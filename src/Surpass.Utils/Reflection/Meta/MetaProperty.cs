@@ -9,7 +9,7 @@ namespace Surpass.Utils.Reflection.Meta
     /// <summary>
     /// 元属性
     /// </summary>
-    public class MetaProperty : MetaMember
+    public class MetaProperty : MetaReadWriteMember
     {
         /// <summary>
         /// 实例化 MetaProperty 类新实例
@@ -18,23 +18,7 @@ namespace Surpass.Utils.Reflection.Meta
         public MetaProperty(PropertyInfo propertyInfo)
             : base(propertyInfo)
         {
-            this.PropertyInfo = propertyInfo;
-            if (propertyInfo.CanRead)
-            {
-                this._GetMemberValue = MethodFactory.CreatePropertyGet<object>(propertyInfo);
-            }
-            else
-            {
-                this._GetMemberValue = null;
-            }
-            if (propertyInfo.CanWrite)
-            {
-                this._SetMemberValue = MethodFactory.CreatePropertySet<object>(propertyInfo);
-            }
-            else
-            {
-                this._SetMemberValue = null;
-            }
+            this.MemberInfo = propertyInfo;            
         }
 
         /// <summary>
@@ -44,7 +28,7 @@ namespace Surpass.Utils.Reflection.Meta
         {
             get
             {
-                return this.PropertyInfo.CanRead;
+                return this.MemberInfo.CanRead;
             }
         }
 
@@ -55,66 +39,66 @@ namespace Surpass.Utils.Reflection.Meta
         {
             get
             {
-                return this.PropertyInfo.CanRead;
+                return this.MemberInfo.CanRead;
             }
         }
 
-        /// <summary>
-        /// 获取属性信息
-        /// </summary>
-        public PropertyInfo PropertyInfo { get; private set; }
-                
-
-#if !DEBUG
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-#endif
-        private Func<object, object> _GetMemberValue;
+        private Func<object, object> readValue;
 
         /// <summary>
-        /// 获取成员值
+        /// 获取值
         /// </summary>
-        public sealed override Func<object, object> GetMemberValue
+        /// <param name="instance">实例</param>
+        /// <returns></returns>
+        public override object GetValue(object instance)
         {
-            get
+            if (!this.CanRead)
             {
-                return this._GetMemberValue;
+                throw new NotSupportedException("不支持读取操作");
             }
+            var read = this.GetRefField<Func<object, object>>(ref this.readValue, () =>
+            {
+                return MethodFactory.CreatePropertyGet<object>(this.MemberInfo);
+            });           
+            return read(instance);
         }
 
-#if !DEBUG
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-#endif
-        private Action<object, object> _SetMemberValue;
+        private Action<object, object> writeValue;
 
         /// <summary>
-        /// 设置成员值
+        /// 设置值
         /// </summary>
-        public sealed override Action<object, object> SetMemberValue
+        /// <param name="instance"></param>
+        /// <param name="value"></param>
+        public override void SetValue(object instance, object value)
         {
-            get
+            if (!this.CanWrite)
             {
-                return this._SetMemberValue;
+                throw new NotSupportedException("不支持写取操作");
             }
+            var write = this.GetRefField<Action<object, object>>(ref this.writeValue, () =>
+            {
+                return MethodFactory.CreatePropertySet<object>(this.MemberInfo);               
+            }); 
+            write(instance, value);
         }
 
         /// <summary>
         /// 获取成员
-        /// </summary>
-#if !DEBUG
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-#endif
-        [Browsable(false), EditorBrowsable(EditorBrowsableState.Never)]
-        public new MemberInfo MemberInfo
-        {
-            get { return this.PropertyInfo; }
-        }
+        /// </summary>       
+        public new PropertyInfo MemberInfo { get; private set; }
 
         /// <summary>
-        /// 获取是否是属性
+        /// 获取元成员类型
         /// </summary>
-        public sealed override bool IsProperty
+        public sealed override MemberType MemberType
         {
-            get { return true; }
+            get
+            {
+                return MemberType.Property;
+            }
         }
 
         /// <summary>
@@ -123,10 +107,12 @@ namespace Surpass.Utils.Reflection.Meta
         public override void Dispose()
         {
             base.Dispose();
-            this._SetMemberValue = null;
-            this.PropertyInfo = null;
-            this._SetMemberValue = null;
+            this.writeValue = null;
+            this.MemberInfo = null;
+            this.writeValue = null;
 
         }
+
+
     }
 }

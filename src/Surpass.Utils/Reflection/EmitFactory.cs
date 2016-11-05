@@ -19,7 +19,7 @@ namespace Surpass.Utils.Reflection
         /// </summary>
         /// <param name="il">指令</param>
         /// <param name="value">值</param>
-        public static void EmitInt32(this ILGenerator il, int value)
+        public static void EmitIndex(this ILGenerator il, int value)
         {
             switch (value)
             {
@@ -75,6 +75,74 @@ namespace Surpass.Utils.Reflection
                 return OpCodes.Ldc_I4_S;
 
             throw new ArgumentException(string.Format(Resources.UnknownLdcId, index));
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="gen"></param>
+        /// <param name="index"></param>
+        public static void StoreStloc(this ILGenerator gen, int index)
+        {
+            switch (index)
+            {
+                case 0:
+                    gen.Emit(OpCodes.Stloc_0);
+                    break;
+                case 1:
+                    gen.Emit(OpCodes.Stloc_1);
+                    break;
+                case 2:
+                    gen.Emit(OpCodes.Stloc_2);
+                    break;
+                case 3:
+                    gen.Emit(OpCodes.Stloc_3);
+                    break;
+                default:
+                    if (index >= -128 && index <= 127)
+                    {
+                        gen.Emit(OpCodes.Stloc_S, index);
+                    }
+                    else
+                    {
+                        gen.Emit(OpCodes.Stloc, index);
+                    }
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="gen"></param>
+        /// <param name="index"></param>
+        public static void LoadStloc(this ILGenerator gen, int index)
+        {
+            switch (index)
+            {
+                case 0:
+                    gen.Emit(OpCodes.Ldloc_0);
+                    break;
+                case 1:
+                    gen.Emit(OpCodes.Ldloc_1);
+                    break;
+                case 2:
+                    gen.Emit(OpCodes.Ldloc_2);
+                    break;
+                case 3:
+                    gen.Emit(OpCodes.Ldloc_3);
+                    break;
+                default:
+                    if (index >= -128 && index <= 127)
+                    {
+                        gen.Emit(OpCodes.Ldloc_S, index);
+                    }
+                    else
+                    {
+                        gen.Emit(OpCodes.Ldloc, index);
+                    }
+                    break;
+            }
         }
 
         /// <summary>
@@ -160,7 +228,7 @@ namespace Surpass.Utils.Reflection
             }
         }
 
-        
+
 
         /// <summary>
         /// 将指定索引变量推到当前堆栈上

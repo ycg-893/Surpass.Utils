@@ -302,23 +302,16 @@ namespace Surpass.Utils
         private static bool IsSetTypeOrNullableDefinitionSetType(Type type, ISet<Type> comparerSet)
         {
             ExceptionUtils.CheckNotNull(type, nameof(type));
-            if (type.IsValueType)
+            if (comparerSet.Contains(type))
             {
-                if (comparerSet.Contains(type))
-                {
-                    return true;
-                }
-                Type valueType;
-                if (IsNullableType(type, out valueType))
-                {
-                    return comparerSet.Contains(valueType);
-                }
-                return false;
+                return true;
             }
-            else
+            Type valueType;
+            if (IsNullableType(type, out valueType))
             {
-                return false;
+                return comparerSet.Contains(valueType);
             }
+            return false;
         }
 
         /// <summary>
@@ -358,7 +351,7 @@ namespace Surpass.Utils
         /// </summary>
         /// <param name="type">类型</param>
         /// <returns></returns>
-        public static bool IsBaseTypeOrNullableDefinitionBaseTType(this Type type)
+        public static bool IsBaseTypeOrNullableDefinitionBaseType(this Type type)
         {
             return IsSetTypeOrNullableDefinitionSetType(type, BaseTypeSet);
         }

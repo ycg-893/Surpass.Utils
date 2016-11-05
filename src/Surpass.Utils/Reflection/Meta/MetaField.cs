@@ -9,7 +9,7 @@ namespace Surpass.Utils.Reflection.Meta
     /// <summary>
     /// 元字段
     /// </summary>
-    public class MetaField : MetaMember
+    public class MetaField : MetaReadWriteMember
     {
         /// <summary>
         /// 实例化 MetaField 类新实例
@@ -18,17 +18,7 @@ namespace Surpass.Utils.Reflection.Meta
         public MetaField(FieldInfo fieldInfo)
             : base(fieldInfo)
         {
-            this.FieldInfo = fieldInfo;
-            this._GetMemberValue = MethodFactory.CreateFieldGet<object>(fieldInfo);
-            if (fieldInfo.IsInitOnly)
-            {
-                this._SetMemberValue = null;
-            }
-            else
-            {
-                this._SetMemberValue = MethodFactory.CreateFieldSet<object>(fieldInfo);
-            }
-
+            this.MemberInfo = fieldInfo;
         }
 
         /// <summary>
@@ -49,65 +39,62 @@ namespace Surpass.Utils.Reflection.Meta
         {
             get
             {
-                return !this.FieldInfo.IsInitOnly;
+                return !this.MemberInfo.IsInitOnly;
             }
         }
 
-        /// <summary>
-        /// 获取字段
-        /// </summary>
-        public FieldInfo FieldInfo { get; private set; }
-
-#if !DEBUG
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-#endif
-        private Func<object, object> _GetMemberValue;
+        private Func<object, object> readValue;
 
         /// <summary>
-        /// 获取成员值
+        /// 获取值
         /// </summary>
-        public override Func<object, object> GetMemberValue
+        /// <param name="instance">实例</param>
+        /// <returns></returns>
+        public override object GetValue(object instance)
         {
-            get
-            {
-                return this._GetMemberValue;
-            }
+            var read = this.GetRefField<Func<object, object>>(ref this.readValue, () =>
+            {                
+                return MethodFactory.CreateFieldGet<object>(this.MemberInfo);
+            });
+            return read(instance);
         }
 
-#if !DEBUG
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-#endif
-        private Action<object, object> _SetMemberValue;
+        private Action<object, object> writeValue;
 
         /// <summary>
-        /// 设置成员值
+        /// 设置值
         /// </summary>
-        public sealed override Action<object, object> SetMemberValue
+        /// <param name="instance"></param>
+        /// <param name="value"></param>
+        public override void SetValue(object instance, object value)
         {
-            get
+            if (!this.CanWrite)
             {
-                return this._SetMemberValue;
+                throw new NotSupportedException("不支持写取操作");
             }
+            var write = this.GetRefField<Action<object, object>>(ref this.writeValue, () =>
+            {
+                return MethodFactory.CreateFieldSet<object>(this.MemberInfo);               
+            });
+            write(instance, value);
         }
 
         /// <summary>
         /// 获取成员
-        /// </summary>
-#if !DEBUG
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-#endif
-        [Browsable(false), EditorBrowsable(EditorBrowsableState.Never)]
-        public new MemberInfo MemberInfo
-        {
-            get { return this.FieldInfo; }
-        }
+        /// </summary>       
+        public new FieldInfo MemberInfo { get; private set; }
 
         /// <summary>
-        /// 获取是否是属性
+        /// 获取元成员类型
         /// </summary>
-        public sealed override bool IsProperty
+        public sealed override MemberType MemberType
         {
-            get { return false; }
+            get
+            {
+                return MemberType.Field;
+            }
         }
 
         /// <summary>
@@ -116,9 +103,9 @@ namespace Surpass.Utils.Reflection.Meta
         public override void Dispose()
         {
             base.Dispose();
-            this._SetMemberValue = null;
-            this.FieldInfo = null;
-            this._SetMemberValue = null;
-        }
+            this.readValue = null;
+            this.MemberInfo = null;
+            this.writeValue = null;
+        }        
     }
 }

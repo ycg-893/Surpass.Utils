@@ -33,7 +33,7 @@ namespace Surpass.Utils.DataResult
                 Expression Argument;
                 Expression CurrentExpression = body.Arguments[memberIndex];
                 Type type = item.GetMemberType();
-                if (type.IsBaseTypeOrNullableDefinitionBaseTType()) //基本类型
+                if (type.IsBaseTypeOrNullableDefinitionBaseType()) //基本类型
                 {
                     Argument = builder.ScalarExpressionBody(type, item.Name);
                 }

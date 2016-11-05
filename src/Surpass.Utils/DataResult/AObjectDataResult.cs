@@ -33,7 +33,7 @@ namespace Surpass.Utils.DataResult
         {
             ExceptionUtils.CheckNotNull(type, nameof(type));
             this.ResultType = type;
-            this.IsGeneralType = type.IsBaseTypeOrNullableDefinitionBaseTType() || type == typeof(object);
+            this.IsGeneralType = type.IsBaseTypeOrNullableDefinitionBaseType() || type == typeof(object);
             if (!this.IsGeneralType)
             {
                 if (!type.IsClass)
