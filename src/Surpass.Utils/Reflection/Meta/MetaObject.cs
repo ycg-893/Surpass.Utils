@@ -85,7 +85,6 @@ namespace Surpass.Utils.Reflection.Meta
             //初始化特性集合
             this.InitAttributes();
             List<MetaMember> items = new List<MetaMember>();
-
             //初始构造函数
             this.InitConstructor(items);
             //初始字段

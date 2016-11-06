@@ -33,6 +33,12 @@ namespace Surpass.Utils.Test.Entities
             this.UserId = userId;
         }
 
+        public UserInfo(string userId, string userName)
+        {
+            this.UserId = userId;
+            this.UserName = userName;
+        }
+
         /// <summary>
         /// 用户Id
         /// </summary>

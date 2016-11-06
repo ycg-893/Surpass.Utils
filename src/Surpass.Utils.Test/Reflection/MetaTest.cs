@@ -67,45 +67,59 @@ namespace Surpass.Utils.Test.Reflection
         [Test]
         public void MethodTest()
         {
-            var metaObject = MetaObject.GetOrAddCacheMetaObject(typeof(UserInfo));
-            
-
-            List<UserInfo> users = new List<UserInfo>();
-
-
-
             UserInfo user = new UserInfo();
             Type type = typeof(UserInfo);
-
-            var method = type.GetMethod("Calc");
-            var metaMethod = new MetaMethod(method);
-            var value = metaMethod.Invoke(user, 1, 2L);
-
-
-            ConstructorInfo con = type.GetConstructor(Type.EmptyTypes);
-
-            var fun = MethodFactory.CreateConstructorMethod<object>(con);
-
-            var ut = fun(null);
-
-            if (ut != null)
-            {
-
-            }
-
-            con = type.GetConstructor(new Type[] { typeof(string) });
-
-            var fun1 = MethodFactory.CreateConstructorMethod<object>(con);
-
-            var ut1 = fun1(new object[] { "aaaaa" });
-
-            if (ut1 != null)
-            {
-
-            }
+            MethodInfo method;
+            MetaMethod metaMethod;
+            object value;
 
 
+            //method = type.GetMethod("set_Add");
+            //metaMethod = new MetaMethod(method);
+            //value = metaMethod.Invoke(user);
+
+            //Assert.True(value == null);
+
+            //method = type.GetMethod("Calc");
+            //metaMethod = new MetaMethod(method);
+            //value = metaMethod.Invoke(user, 1, 2L);
+
+            //Assert.True(value!=null);
+
+            //method = type.GetMethod("Abc");
+            //metaMethod = new MetaMethod(method);
+            //value = metaMethod.Invoke(user);
+            //Assert.True(value != null);
+
+            method = type.GetMethod("Up");
+            metaMethod = new MetaMethod(method);
+            value = metaMethod.Invoke(user, 1);
+            Assert.True(value != null);
         }
 
+        [Test]
+        public void ConstructorTest()
+        {
+            var metaObject = MetaObject.GetOrAddCacheMetaObject(typeof(UserInfo));
+
+            object obj = metaObject.CreateInstance<UserInfo>();
+
+            if (obj != null)
+            {
+
+            }
+
+            var con = metaObject.GetMetaConstructor(typeof(string), typeof(string));
+
+            if (con != null)
+            {
+                obj = con.CreateInstance("中华人民共和国", "好的");
+                if (obj != null)
+                {
+
+                }
+            }
+
+        }
     }
 }

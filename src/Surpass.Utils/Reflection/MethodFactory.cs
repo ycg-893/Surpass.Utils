@@ -80,6 +80,22 @@ namespace Surpass.Utils.Reflection
         private static ParameterExpression parametersParameter = Expression.Parameter(typeof(object[]), "parameters");
 
         /// <summary>
+        /// 获取参数类型集合
+        /// </summary>
+        /// <param name="parameterInfos"></param>
+        /// <returns></returns>
+        private static Type[] GetParameterTypes(ParameterInfo[] parameterInfos)
+        {
+            var paramArray = parameterInfos;
+            var types = new Type[paramArray.Length];
+            for (int i = 0; i < paramArray.Length; i++)
+            {
+                types[i] = paramArray[i].ParameterType;
+            }
+            return types;
+        }
+
+        /// <summary>
         /// 创建构造方法
         /// </summary>       
         /// <param name="constructorInfo">构造</param>
@@ -117,19 +133,7 @@ namespace Surpass.Utils.Reflection
             var lambda = Expression.Lambda<Func<object[], T>>(instanceExpression, parametersParameter);
             return lambda.Compile();
         }
-
-
-        private static Type[] GetMethodParameterTypes(MethodInfo methodInfo)
-        {
-            var paramArray = methodInfo.GetParameters();
-            var types = new Type[paramArray.Length];
-            for (int i = 0; i < paramArray.Length; i++)
-            {
-                types[i] = paramArray[i].ParameterType;
-            }
-            return types;
-        }
-
+        
         /// <summary>
         /// 创建调用方法
         /// </summary>       
@@ -137,71 +141,72 @@ namespace Surpass.Utils.Reflection
         /// <returns></returns>
         public static Func<object, object[], object> CreateInvokeMethod(MethodInfo methodInfo)
         {
+            //以下两种方法无不支持泛型方法
+
             ExceptionUtils.CheckNotNull(methodInfo, nameof(methodInfo));
-            //DynamicMethod dynamicMethod = CreateDynamicMethod(methodInfo.Name, typeof(object), GetMethodParameterTypes(methodInfo),
-            //    methodInfo.ReflectedType);
-            //ILGenerator generator = dynamicMethod.GetILGenerator();
+            DynamicMethod dynamicMethod = CreateDynamicMethod(methodInfo.Name, typeof(object),
+                new Type[] { typeof(object), typeof(object[]) },
+                methodInfo.ReflectedType);
 
-            //if (!methodInfo.IsStatic)
-            //{
-            //    generator.PushInstance(methodInfo.ReflectedType);
-            //}
-            //ParameterInfo[] paramInfos = methodInfo.GetParameters();
-            //foreach (var info in paramInfos)
-            //{
-            //    generator.DeclareLocal(info.ParameterType);
-            //}
-            //for (int i = 0; i < paramInfos.Length; ++i)
-            //{
-            //    var parameterType = paramInfos[i].ParameterType;
-            //    generator.Ldarg(0);
-            //    generator.EmitIndex(i);
-            //    generator.Emit(parameterType.GetLdelem());
-            //    generator.BoxIfNeeded(parameterType);
-            //    generator.StoreStloc(i);
-            //}
-            //for (int i = 0; i < paramInfos.Length; ++i)
-            //{
-            //    generator.LoadStloc(i);
-            //}
-
-            //if (methodInfo.ReturnType == typeof(void))
-            //{
-            //    generator.Emit(OpCodes.Ldnull);
-            //}
-
-            //generator.CallMethod(methodInfo);
-            //generator.BoxIfNeeded(methodInfo.ReturnType);
-            //generator.Emit(OpCodes.Ret);
-            //return (Func<object, object[], object>)dynamicMethod.CreateDelegate(typeof(Func<object, object[], object>));
-
-
-            List<Expression> parameterExpressions = new List<Expression>();
-            ParameterInfo[] paramInfos = methodInfo.GetParameters();
-            for (int i = 0; i < paramInfos.Length; i++)
+            ILGenerator il = dynamicMethod.GetILGenerator();            
+            Type[] paramTypes = GetParameterTypes(methodInfo.GetParameters());
+            LocalBuilder[] locals = new LocalBuilder[paramTypes.Length];
+            for (int i = 0; i < paramTypes.Length; i++)
             {
-                BinaryExpression valueObj = Expression.ArrayIndex(parametersParameter, Expression.Constant(i));
-                UnaryExpression valueCast = Expression.Convert(valueObj, paramInfos[i].ParameterType);
-                parameterExpressions.Add(valueCast);
+                locals[i] = il.DeclareLocal(paramTypes[i]);
             }
-            Expression instanceCast = methodInfo.IsStatic ? null : Expression.Convert(instanceParameter, methodInfo.ReflectedType);
-            MethodCallExpression methodCall = Expression.Call(instanceCast, methodInfo, parameterExpressions);
-            if (methodCall.Type == typeof(void))
+            for (int i = 0; i < paramTypes.Length; i++)
             {
-                Expression<Action<object, object[]>> lambda = Expression.Lambda<Action<object, object[]>>(methodCall, instanceParameter, parametersParameter);
-                Action<object, object[]> execute = lambda.Compile();
-                return (instance, parameters) =>
-                    {
-                        execute(instance, parameters);
-                        return null;
-                    };
+                Type paramType = paramTypes[i];
+                il.Emit(OpCodes.Ldarg_1);
+                il.EmitIndex(i);              
+                il.Emit(paramType.GetLdelem());
+                il.UnboxIfNeeded(paramType);
+                il.Emit(OpCodes.Stloc, locals[i]);
+            }
+            il.Emit(OpCodes.Ldarg_0);
+            for (int i = 0; i < paramTypes.Length; i++)
+            {
+                il.Emit(OpCodes.Ldloc, locals[i]);
+            }
+            il.CallMethod(methodInfo);
+            if (methodInfo.ReturnType == typeof(void))
+            {
+                il.Emit(OpCodes.Ldnull);
             }
             else
             {
-                UnaryExpression castMethodCall = Expression.Convert(methodCall, typeof(object));
-                Expression<Func<object, object[], object>> lambda = Expression.Lambda<Func<object, object[], object>>(castMethodCall, instanceParameter, parametersParameter);
-                return lambda.Compile();
+                il.BoxIfNeeded(methodInfo.ReturnType);
             }
+            il.Emit(OpCodes.Ret);
+            return (Func<object, object[], object>)dynamicMethod.CreateDelegate(typeof(Func<object, object[], object>));
+        
+            //List<Expression> parameterExpressions = new List<Expression>();
+            //ParameterInfo[] paramInfos = methodInfo.GetParameters();
+            //for (int i = 0; i < paramInfos.Length; i++)
+            //{
+            //    BinaryExpression valueObj = Expression.ArrayIndex(parametersParameter, Expression.Constant(i));
+            //    UnaryExpression valueCast = Expression.Convert(valueObj, paramInfos[i].ParameterType);
+            //    parameterExpressions.Add(valueCast);
+            //}
+            //Expression instanceCast = methodInfo.IsStatic ? null : Expression.Convert(instanceParameter, methodInfo.ReflectedType);
+            //MethodCallExpression methodCall = Expression.Call(instanceCast, methodInfo, parameterExpressions);
+            //if (methodCall.Type == typeof(void))
+            //{
+            //    Expression<Action<object, object[]>> lambda = Expression.Lambda<Action<object, object[]>>(methodCall, instanceParameter, parametersParameter);
+            //    Action<object, object[]> execute = lambda.Compile();
+            //    return (instance, parameters) =>
+            //        {
+            //            execute(instance, parameters);
+            //            return null;
+            //        };
+            //}
+            //else
+            //{
+            //    UnaryExpression castMethodCall = Expression.Convert(methodCall, typeof(object));
+            //    Expression<Func<object, object[], object>> lambda = Expression.Lambda<Func<object, object[], object>>(castMethodCall, instanceParameter, parametersParameter);
+            //    return lambda.Compile();
+            //}
         }
 
         /// <summary>
@@ -247,21 +252,6 @@ namespace Surpass.Utils.Reflection
             return (Func<T, object>)dynamicMethod.CreateDelegate(typeof(Func<T, object>));
         }
 
-        /// <summary>
-        /// 调用成员
-        /// </summary>
-        /// <param name="generator">指令</param>
-        /// <param name="methodInfo">方法元素</param>
-        public static void CallMethod(this ILGenerator generator, MethodInfo methodInfo)
-        {
-            if (methodInfo.IsFinal || !methodInfo.IsVirtual)
-            {
-                generator.Emit(OpCodes.Call, methodInfo);
-            }
-            else
-            {
-                generator.Emit(OpCodes.Callvirt, methodInfo);
-            }
-        }
+        
     }
 }

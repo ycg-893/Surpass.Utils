@@ -290,5 +290,22 @@ namespace Surpass.Utils.Reflection
         {
             generator.Emit(OpCodes.Ldfld, field);
         }
+
+        /// <summary>
+        /// 调用成员
+        /// </summary>
+        /// <param name="generator">指令</param>
+        /// <param name="methodInfo">方法元素</param>
+        public static void CallMethod(this ILGenerator generator, MethodInfo methodInfo)
+        {
+            if (methodInfo.IsFinal || !methodInfo.IsVirtual)
+            {
+                generator.Emit(OpCodes.Call, methodInfo);
+            }
+            else
+            {
+                generator.Emit(OpCodes.Callvirt, methodInfo);
+            }
+        }
     }
 }

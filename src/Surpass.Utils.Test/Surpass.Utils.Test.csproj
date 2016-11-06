@@ -38,6 +38,7 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EmitTest.cs" />
     <Compile Include="Entities\UserInfo.cs" />
     <Compile Include="Net\HttpClientTest.cs" />
     <Compile Include="Net\UrlEncoderUtilsTest.cs" />
