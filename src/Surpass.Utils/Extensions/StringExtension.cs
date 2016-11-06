@@ -30,6 +30,11 @@ namespace Surpass.Utils
         public const string ALLNumberOrLetterPattern = "^[a-zA-Z0-9]+[a-zA-z0-9]$+";
 
         /// <summary>
+        /// 中文表达式
+        /// </summary>
+        public const string ChinesePattern = "[\u4E00 - \u9FA0]+";
+
+        /// <summary>
         /// 是否是空白字符
         /// </summary>
         /// <param name="value">值</param>
@@ -67,6 +72,10 @@ namespace Surpass.Utils
         /// <returns></returns>
         public static bool IsContainsBlank(this string value)
         {
+            if (value == null)
+            {
+                return false;
+            }
             return value.Contains(" ");
         }
 
@@ -210,9 +219,12 @@ namespace Surpass.Utils
         /// <param name="value">值</param>
         /// <param name="length">长度</param>
         /// <returns></returns>
-        public static string LeftValue(this string value, int length)
+        public static string Left(this string value, int length)
         {
-            value = ExceptionUtils.CheckNotNullAndWhiteSpace(value, nameof(value));
+            if (value == null)
+            {
+                return value;
+            }
             if (length >= value.Length)
             {
                 return value;
@@ -229,9 +241,12 @@ namespace Surpass.Utils
         /// <param name="value">值</param>
         /// <param name="length">长度</param>
         /// <returns></returns>
-        public static string RightValue(this string value, int length)
+        public static string Right(this string value, int length)
         {
-            value = ExceptionUtils.CheckNotNullAndWhiteSpace(value, nameof(value));
+            if (value == null)
+            {
+                return value;
+            }
             if (length >= value.Length)
             {
                 return value;
@@ -269,7 +284,10 @@ namespace Surpass.Utils
         /// <returns></returns>
         public static string FirstLetterUpperCase(this string value)
         {
-            value = ExceptionUtils.CheckNotNullAndWhiteSpace(value, nameof(value));
+            if (value == null)
+            {
+                return value;
+            }
             if (value.Length > 1)
             {
                 return string.Format("{0}{1}", value.Substring(0, 1).ToUpperInvariant(), value.Substring(1));
@@ -280,133 +298,188 @@ namespace Surpass.Utils
             }
         }
 
-
-        #region ByteArray
-
         /// <summary>
-        /// 获取默认格式的编码字节数组
+        /// 返回的字符串数组包含此字符串中的子字符串（由指定字符串数组的元素分隔）。参数指定是否返回空数组元素。
         /// </summary>
         /// <param name="value">值</param>
+        /// <param name="separator">分隔此字符串中的子字符串的字符串数组、不包含分隔符的空数组或 null。</param>
         /// <returns></returns>
-        public static byte[] ToDefaultBytes(this string value)
+        public static string[] Split(this string value, string separator)
         {
-            return Encoding.Default.GetBytes(value);
+            return Split(value, separator, StringSplitOptions.RemoveEmptyEntries);
         }
 
         /// <summary>
-        /// 获取 GB2312 格式的编码字节数组
+        /// 返回的字符串数组包含此字符串中的子字符串（由指定字符串数组的元素分隔）。参数指定是否返回空数组元素。
         /// </summary>
         /// <param name="value">值</param>
+        /// <param name="separator">分隔此字符串中的子字符串的字符串数组、不包含分隔符的空数组或 null。</param>
+        ///  <param name="options">要省略返回的数组中的空数组元素，则为 System.StringSplitOptions.RemoveEmptyEntries；要包含返回的数组中的空数组元素，则为 System.StringSplitOptions.None。</param>
         /// <returns></returns>
-        public static byte[] ToGB2312Bytes(this string value)
+        public static string[] Split(this string value, string separator, StringSplitOptions options)
         {
-            return Encoding.GetEncoding("GB2312").GetBytes(value);
+            value = ExceptionUtils.CheckNotNull(value, nameof(value));
+            ExceptionUtils.CheckNotNull(separator, nameof(separator));
+            return value.Split(new string[] { separator }, options);
         }
 
         /// <summary>
-        /// 获取 UTF7 格式的编码字节数组
+        /// 返回的字符串数组包含此字符串中的子字符串（由指定字符串数组的元素分隔）。参数指定是否返回空数组元素。
         /// </summary>
         /// <param name="value">值</param>
+        /// <param name="separator">分隔此字符串中的子字符串的字符串数组、不包含分隔符的空数组或 null。</param>
         /// <returns></returns>
-        public static byte[] ToUTF7Bytes(this string value)
+        public static string[] Split(this string value, char separator)
         {
-            return Encoding.UTF7.GetBytes(value);
+            return Split(value, separator, StringSplitOptions.RemoveEmptyEntries);
         }
 
         /// <summary>
-        /// 获取 UTF8 格式的编码字节数组
+        /// 返回的字符串数组包含此字符串中的子字符串（由指定字符串数组的元素分隔）。参数指定是否返回空数组元素。
         /// </summary>
         /// <param name="value">值</param>
+        /// <param name="separator">分隔此字符串中的子字符串的字符串数组、不包含分隔符的空数组或 null。</param>
+        ///  <param name="options">要省略返回的数组中的空数组元素，则为 System.StringSplitOptions.RemoveEmptyEntries；要包含返回的数组中的空数组元素，则为 System.StringSplitOptions.None。</param>
         /// <returns></returns>
-        public static byte[] ToUTF8Bytes(this string value)
+        public static string[] Split(this string value, char separator, StringSplitOptions options)
         {
-            return Encoding.UTF8.GetBytes(value);
+            value = ExceptionUtils.CheckNotNull(value, nameof(value));
+            ExceptionUtils.CheckNotNull(separator, nameof(separator));
+            return value.Split(new char[] { separator }, options);
         }
 
         /// <summary>
-        /// 获取 UTF16 格式的编码字节数组
+        /// 使用 <see cref="Environment.NewLine"/> 分隔出新行 
         /// </summary>
-        /// <param name="value">值</param>
+        /// <param name="str"></param>       
         /// <returns></returns>
-        public static byte[] ToUnicodeBytes(this string value)
+        public static string[] SplitToLines(this string str)
         {
-            return Encoding.Unicode.GetBytes(value);
+            return Split(str, Environment.NewLine);
         }
 
         /// <summary>
-        /// 获取 UTF32 格式的编码字节数组
+        /// 使用 <see cref="Environment.NewLine"/> 分隔出新行
         /// </summary>
-        /// <param name="value">值</param>
+        /// <param name="str"></param>
+        /// <param name="options"></param>
         /// <returns></returns>
-        public static byte[] ToUTF32Bytes(this string value)
+        public static string[] SplitToLines(this string str, StringSplitOptions options)
         {
-            return Encoding.UTF32.GetBytes(value);
-        }
-
-        #endregion
-
-        #region Hash
-
-        /// <summary>
-        /// 转换 Md5 的数组
-        /// </summary>
-        /// <param name="value">值</param>
-        /// <param name="encoding">编码</param>
-        /// <returns></returns>
-        public static byte[] ToMD5Array(this string value, Encoding encoding)
-        {
-            value = ExceptionUtils.CheckNotNullAndWhiteSpace(value, nameof(value));
-            ExceptionUtils.CheckNotNull(encoding, nameof(encoding));
-            HashAlgorithm algorithm = HashAlgorithm.Create("MD5");
-            byte[] bytes = encoding.GetBytes(value);
-            return algorithm.ComputeHash(bytes);
+            return Split(str, Environment.NewLine, options);
         }
 
         /// <summary>
-        /// 转换 Md5 的 Base64 编码值
+        /// 转换为枚举类型
         /// </summary>
-        /// <param name="value">值</param>
-        /// <param name="encoding">编码</param>
+        /// <typeparam name="TEnum">类型</typeparam>
+        /// <param name="value">值</param>     
         /// <returns></returns>
-        public static string ToMD5Base64(this string value, Encoding encoding)
+        public static TEnum ToEnum<TEnum>(this string value) where TEnum : struct
         {
-            return Convert.ToBase64String(value.ToMD5Array(encoding));
+            value = ExceptionUtils.CheckNotNull(value, nameof(value));
+            return (TEnum)Enum.Parse(typeof(TEnum), value);
         }
 
         /// <summary>
-        /// 转换 Md5 的 十六进制值 例如“7F-2C-4A”
+        /// 转换为枚举类型
         /// </summary>
+        /// <typeparam name="TEnum">类型</typeparam>
         /// <param name="value">值</param>
-        /// <param name="encoding">编码</param>
+        /// <param name="ignoreCase">true 为忽略大小写；false 为考虑大小写。</param>
         /// <returns></returns>
-        public static string ToMD5Hex(this string value, Encoding encoding)
+        public static TEnum ToEnum<TEnum>(this string value, bool ignoreCase) where TEnum : struct
         {
-            return System.BitConverter.ToString(ToMD5Array(value, encoding));
+            value = ExceptionUtils.CheckNotNull(value, nameof(value));
+            return (TEnum)Enum.Parse(typeof(TEnum), value, ignoreCase);
         }
 
         /// <summary>
-        /// 转换 Md5 的 十六进制值后生成 Guid 
+        /// 转换为枚举类型
         /// </summary>
+        /// <typeparam name="TEnum">枚举类型</typeparam>
         /// <param name="value">值</param>
-        /// <param name="encoding">编码</param>
+        /// <param name="result">输出类型</param>
         /// <returns></returns>
-        public static Guid ToMD5HexGuid(this string value, Encoding encoding)
+        public static bool TryEnumParse<TEnum>(this string value, TEnum result) where TEnum : struct
         {
-            value = ToMD5Hex(value, encoding).Replace("-", "");
-            return Guid.Parse(value);
+            value = ExceptionUtils.CheckNotNull(value, nameof(value));
+            return Enum.TryParse<TEnum>(value, out result);
         }
 
         /// <summary>
-        /// 转换 Md5 的 十六进制值后生成Guid 例如“0B5A7DE4-E6D1-23FD-D555-712175B9CE92”
+        /// 转换为枚举类型
         /// </summary>
+        /// <typeparam name="TEnum">枚举类型</typeparam>
         /// <param name="value">值</param>
-        /// <param name="encoding">编码</param>
+        /// <param name="ignoreCase">是否区分大小写</param>
+        /// <param name="result">输出类型</param>
         /// <returns></returns>
-        public static string ToMD5HexGuidString(this string value, Encoding encoding)
+        public static bool TryEnumParse<TEnum>(this string value, bool ignoreCase, TEnum result) where TEnum : struct
         {
-            return ToMD5HexGuid(value, encoding).ToString("D").ToUpperInvariant();
+            value = ExceptionUtils.CheckNotNull(value, nameof(value));
+            return Enum.TryParse<TEnum>(value, ignoreCase, out result);
         }
 
-        #endregion
+        /// <summary>
+        /// 转为骆锋命名，即首个字母为小写
+        /// </summary>
+        /// <param name="value">值</param>      
+        /// <returns></returns>
+        public static string ToCamelCase(this string value)
+        {
+            return ToCamelCase(value, CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>
+        /// 转为骆锋命名，即首个字母为小写
+        /// </summary>
+        /// <param name="value">值</param>
+        /// <param name="culture">区域</param>
+        /// <returns></returns>
+        public static string ToCamelCase(this string value, CultureInfo culture)
+        {
+            ExceptionUtils.CheckNotNull(culture, nameof(culture));
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return value;
+            }
+            if (value.Length == 1)
+            {
+                return value.ToLower(culture);
+            }
+            return char.ToLower(value[0], culture) + value.Substring(1);
+        }
+
+        /// <summary>
+        /// 转为帕斯卡命名，即首个字母为大写
+        /// </summary>
+        /// <param name="value">值</param>      
+        /// <returns></returns>
+        public static string ToPascalCase(this string value)
+        {
+            return ToPascalCase(value, CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>
+        /// 转为帕斯卡命名，即首个字母为大写
+        /// </summary>
+        /// <param name="value">值</param>
+        /// <param name="culture">区域</param>
+        /// <returns></returns>
+        public static string ToPascalCase(this string value, CultureInfo culture)
+        {
+            ExceptionUtils.CheckNotNull(culture, nameof(culture));
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return value;
+            }
+            if (value.Length == 1)
+            {
+                return value.ToUpper(culture);
+            }
+            return char.ToUpper(value[0], culture) + value.Substring(1);
+        }
+
     }
 }

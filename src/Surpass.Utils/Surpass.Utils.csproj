@@ -89,6 +89,7 @@
     <Compile Include="Reflection\Meta\MetaReadWriteMember.cs" />
     <Compile Include="Reflection\Meta\TypeKey.cs" />
     <Compile Include="Reflection\MethodFactory.cs" />
+    <Compile Include="Security\Md5Utils.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">

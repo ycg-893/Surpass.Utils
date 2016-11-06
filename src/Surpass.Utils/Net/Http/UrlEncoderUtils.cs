@@ -8,7 +8,7 @@ using System.Web;
 namespace Surpass.Utils.Net.Http
 {
     /// <summary>
-    /// Url 编码帮助
+    /// Url 编码帮助，基ms自带修改，实现标准的相关编解码，处理掉 + / : ? 等相关问题
     /// </summary>
     public static class UrlEncoderUtils
     {
@@ -39,6 +39,11 @@ namespace Surpass.Utils.Net.Http
             return (char)((n - 10) + 0x61);
         }
 
+        /// <summary>
+        /// 是否是安全字符
+        /// </summary>
+        /// <param name="ch"></param>
+        /// <returns></returns>
         private static bool IsUrlSafeChar(char ch)
         {
             if ((((ch < 'a') || (ch > 'z')) && ((ch < 'A') || (ch > 'Z'))) && ((ch < '0') || (ch > '9')))
@@ -51,16 +56,17 @@ namespace Surpass.Utils.Net.Http
                     case '-':
                     case '.':
                     case '!':
-                        break;
+                    case ':':
+                    case '/':
+                    case '?':
+                    case '&':
+                    case '=':
                     case '+':
                     case ',':
-                        return false;
-                    default:
-                        if (ch != '_')
-                        {
-                            return false;
-                        }
+                    case '_':
                         break;
+                    default:
+                        return false;
                 }
             }
             return true;
@@ -87,9 +93,9 @@ namespace Surpass.Utils.Net.Http
             for (int i = 0; i < length; i++)
             {
                 char ch = value[i];
-                if (ch == '+')
+                if (IsUrlSafeChar(ch))
                 {
-                    ch = ' ';
+                    decoder.AddByte((byte)ch);
                 }
                 else if ((ch == '%') && (i < (length - 2)))
                 {
@@ -125,108 +131,7 @@ namespace Surpass.Utils.Net.Http
                         decoder.AddByte(b);
                         continue;
                     }
-                }                
-            }
-            return ValidateString(decoder.GetString());
-        }
-
-        /// <summary>
-        /// Url解码
-        /// </summary>
-        /// <param name="bytes"></param>
-        /// <param name="offset"></param>
-        /// <param name="count"></param>
-        /// <returns></returns>
-        public static byte[] UrlDecode(byte[] bytes, int offset, int count)
-        {
-            if (!ValidateUrlEncodingParameters(bytes, offset, count))
-            {
-                return null;
-            }
-            int length = 0;
-            byte[] sourceArray = new byte[count];
-            for (int i = 0; i < count; i++)
-            {
-                int index = offset + i;
-                byte num4 = bytes[index];
-                if (num4 == 0x2b)
-                {
-                    num4 = 0x20;
                 }
-                else if ((num4 == 0x25) && (i < (count - 2)))
-                {
-                    int num5 = HexToInt((char)bytes[index + 1]);
-                    int num6 = HexToInt((char)bytes[index + 2]);
-                    if ((num5 >= 0) && (num6 >= 0))
-                    {
-                        num4 = (byte)((num5 << 4) | num6);
-                        i += 2;
-                    }
-                }
-                sourceArray[length++] = num4;
-            }
-            if (length < sourceArray.Length)
-            {
-                byte[] destinationArray = new byte[length];
-                Array.Copy(sourceArray, destinationArray, length);
-                sourceArray = destinationArray;
-            }
-            return sourceArray;
-        }
-
-        /// <summary>
-        /// Url解码
-        /// </summary>
-        /// <param name="bytes"></param>
-        /// <param name="offset"></param>
-        /// <param name="count"></param>
-        /// <param name="encoding"></param>
-        /// <returns></returns>
-        public static string UrlDecode(byte[] bytes, int offset, int count, Encoding encoding)
-        {
-            if (!ValidateUrlEncodingParameters(bytes, offset, count))
-            {
-                return null;
-            }
-            if (encoding == null)
-            {
-                encoding = Encoding.UTF8;
-            }
-            UrlDecoder decoder = new UrlDecoder(count, encoding);
-            for (int i = 0; i < count; i++)
-            {
-                int index = offset + i;
-                byte b = bytes[index];
-                if (b == 0x2b)
-                {
-                    b = 0x20;
-                }
-                else if ((b == 0x25) && (i < (count - 2)))
-                {
-                    if ((bytes[index + 1] == 0x75) && (i < (count - 5)))
-                    {
-                        int num4 = HexToInt((char)bytes[index + 2]);
-                        int num5 = HexToInt((char)bytes[index + 3]);
-                        int num6 = HexToInt((char)bytes[index + 4]);
-                        int num7 = HexToInt((char)bytes[index + 5]);
-                        if (((num4 < 0) || (num5 < 0)) || ((num6 < 0) || (num7 < 0)))
-                        {
-                            decoder.AddByte(b);
-                            continue;
-                        }
-                        char ch = (char)((((num4 << 12) | (num5 << 8)) | (num6 << 4)) | num7);
-                        i += 5;
-                        decoder.AddChar(ch);
-                        continue;
-                    }
-                    int num8 = HexToInt((char)bytes[index + 1]);
-                    int num9 = HexToInt((char)bytes[index + 2]);
-                    if ((num8 >= 0) && (num9 >= 0))
-                    {
-                        b = (byte)((num8 << 4) | num9);
-                        i += 2;
-                    }
-                }              
             }
             return ValidateString(decoder.GetString());
         }
@@ -249,11 +154,7 @@ namespace Surpass.Utils.Net.Http
             for (int i = 0; i < count; i++)
             {
                 char ch = (char)bytes[offset + i];
-                if (ch == ' ')
-                {
-                    num++;
-                }
-                else if (!IsUrlSafeChar(ch))
+                if (!IsUrlSafeChar(ch))
                 {
                     num2++;
                 }
@@ -277,10 +178,6 @@ namespace Surpass.Utils.Net.Http
                 if (IsUrlSafeChar(ch2))
                 {
                     buffer[num3++] = num6;
-                }
-                else if (ch2 == ' ')
-                {
-                    buffer[num3++] = 0x2b;
                 }
                 else
                 {

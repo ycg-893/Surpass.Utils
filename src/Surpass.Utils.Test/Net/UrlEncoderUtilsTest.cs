@@ -17,9 +17,65 @@ namespace Surpass.Utils.Test.Net
         [Test]
         public void Test1()
         {
-            string str = "中华人民共和国";
+            string str = "中华人民共和国";          
+            var value = UrlEncoderUtils.UrlEncode(str, null);           
+            var str1 = UrlEncoderUtils.UrlDecode(value, null);
+            Console.WriteLine(str + " -> " + value + " -> "  + str1);
+            Assert.True(str == str1);
+
+        }
+
+        [Test]
+        public void Test2()
+        {
+            string str = " ";          
+            var value = UrlEncoderUtils.UrlEncode(str, null);           
+            var str1 = UrlEncoderUtils.UrlDecode(value, null);
+            Console.WriteLine(str + " -> " + value + " -> " + str1);
+            Assert.True(str == str1);
+
+        }
+
+        [Test]
+        public void Test3()
+        {
+            string str = "http://www.abc.com";          
+            var value = UrlEncoderUtils.UrlEncode(str, null);          
+            var str1 = UrlEncoderUtils.UrlDecode(value, null);
+            Console.WriteLine(str + " -> " + value + " -> " + str1);
+            Assert.True(str == str1);
+
+        }
+
+        [Test]
+        public void Test4()
+        {
+            string str = "http://www.abc.com?a=中 国&b=abc";          
+            var value = UrlEncoderUtils.UrlEncode(str, null);            
+            var str1 = UrlEncoderUtils.UrlDecode(value, null);
+            Console.WriteLine(str + " -> " + value + " -> " + str1);
+            Assert.True(str == str1);
+
+        }
+
+        [Test]
+        public void Test5()
+        {
+            string str = "中";         
+            var value = UrlEncoderUtils.UrlEncode(str, null);         
+            var str1 = UrlEncoderUtils.UrlDecode(value, null);
+            Console.WriteLine(str + " -> " + value + " -> " + str1);
+            Assert.True(str == str1);
+
+        }
+
+        [Test]
+        public void Test6()
+        {
+            string str = "http://www.abc.com?a=++c";
             var value = UrlEncoderUtils.UrlEncode(str, null);
             var str1 = UrlEncoderUtils.UrlDecode(value, null);
+            Console.WriteLine(str + " -> " + value + " -> " + str1);
             Assert.True(str == str1);
 
         }
