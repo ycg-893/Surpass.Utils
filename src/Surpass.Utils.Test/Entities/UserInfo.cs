@@ -61,9 +61,13 @@ namespace Surpass.Utils.Test.Entities
         /// </summary>
         /// <param name="userId"></param>
         /// <param name="state"></param>
-        public void SetState(string userId, int state)
+        public int Calc1(int userId, int state)
         {
+            if (userId >0)
+            {
 
+            }
+            return userId + state;
         }
 
         /// <summary>

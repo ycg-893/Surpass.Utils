@@ -298,7 +298,7 @@ namespace Surpass.Utils.Reflection
         /// <param name="methodInfo">方法元素</param>
         public static void CallMethod(this ILGenerator generator, MethodInfo methodInfo)
         {
-            if (methodInfo.IsFinal || !methodInfo.IsVirtual)
+            if (methodInfo.IsFinal || !methodInfo.IsVirtual || methodInfo.IsStatic)
             {
                 generator.Emit(OpCodes.Call, methodInfo);
             }

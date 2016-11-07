@@ -12,7 +12,11 @@ namespace Surpass.Utils.Net.Http
     /// </summary>
     public static class UrlEncoderUtils
     {
-
+        /// <summary>
+        /// 十六进制转十进制
+        /// </summary>
+        /// <param name="h">值</param>
+        /// <returns></returns>
         private static int HexToInt(char h)
         {
             if (h >= '0' && h <= '9')
@@ -30,6 +34,11 @@ namespace Surpass.Utils.Net.Http
             return -1;
         }
 
+        /// <summary>
+        /// 十进制转十六进制
+        /// </summary>
+        /// <param name="n">值</param>
+        /// <returns></returns>
         private static char IntToHex(int n)
         {
             if (n <= 9)
@@ -145,7 +154,7 @@ namespace Surpass.Utils.Net.Http
         /// <returns></returns>
         public static byte[] UrlEncode(byte[] bytes, int offset, int count)
         {
-            if (!ValidateUrlEncodingParameters(bytes, offset, count))
+            if (!ValidateByteArrayOffset(bytes, offset, count))
             {
                 return null;
             }
@@ -251,7 +260,7 @@ namespace Surpass.Utils.Net.Http
             return new string(chArray);
         }
 
-        private static bool ValidateUrlEncodingParameters(byte[] bytes, int offset, int count)
+        private static bool ValidateByteArrayOffset(byte[] bytes, int offset, int count)
         {
             if (bytes == null && count == 0)
             {

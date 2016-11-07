@@ -74,15 +74,20 @@ namespace Surpass.Utils.Test.Reflection
             object value;
 
 
-            //method = type.GetMethod("set_Add");
-            //metaMethod = new MetaMethod(method);
-            //value = metaMethod.Invoke(user);
+            method = type.GetMethod("set_Add");
+            metaMethod = new MetaMethod(method);
+            value = metaMethod.Invoke(user);
 
-            //Assert.True(value == null);
+            Assert.True(value == null);
 
-            //method = type.GetMethod("Calc");
-            //metaMethod = new MetaMethod(method);
-            //value = metaMethod.Invoke(user, 1, 2L);
+            method = type.GetMethod("Calc");
+            metaMethod = new MetaMethod(method);
+            value = metaMethod.Invoke(user, 1, 2L);
+       
+
+            method = type.GetMethod("Calc1");
+            metaMethod = new MetaMethod(method);
+            value = metaMethod.Invoke(user, 1, 1);
 
             //Assert.True(value!=null);
 

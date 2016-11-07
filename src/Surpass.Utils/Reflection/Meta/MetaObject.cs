@@ -213,7 +213,7 @@ namespace Surpass.Utils.Reflection.Meta
         /// <param name="items"></param>
         private void InitMethod(List<MetaMember> items)
         {
-            Dictionary<string, List<MetaMethod>> methodDic = new Dictionary<string, List<MetaMethod>>();
+            Dictionary<MethodInfo, MetaMethod> methodDic = new Dictionary<MethodInfo, MetaMethod>();
             var methods = this.Type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.InvokeMethod);
             foreach (var method in methods)
             {
@@ -229,29 +229,11 @@ namespace Surpass.Utils.Reflection.Meta
                     isAdd = false;
                 }
                 if (isAdd && !IsSystemMethod(method))
-                {
-                    var metaMethod = new MetaMethod(method);
-                    items.Add(metaMethod);
-                    List<MetaMethod> lstMethod;
-                    if (methodDic.TryGetValue(method.Name, out lstMethod))
-                    {
-                        lstMethod.Add(metaMethod);
-                    }
-                    else
-                    {
-                        lstMethod = new List<MetaMethod>();
-                        lstMethod.Add(metaMethod);
-                        methodDic[method.Name] = lstMethod;
-                    }
+                {                  
+                    methodDic[method] = new MetaMethod(method); 
                 }
-            }
-            Dictionary<string, IList<MetaMethod>> dic = new Dictionary<string, IList<MetaMethod>>();
-            foreach (var m in methodDic)
-            {
-                dic[m.Key] = m.Value.AsReadOnly();
-            }
-            this.Methods = new ReadOnlyDictionary<string, IList<MetaMethod>>(dic);
-            methodDic.Clear();
+            }            
+            this.Methods = new ReadOnlyDictionary<MethodInfo, MetaMethod>(methodDic);          
         }
 
         /// <summary>
@@ -329,6 +311,6 @@ namespace Surpass.Utils.Reflection.Meta
         /// <summary>
         /// 获取方法字典集合(不包含属性方法)
         /// </summary>
-        public IDictionary<string, IList<MetaMethod>> Methods { get; private set; }
+        public IDictionary<MethodInfo, MetaMethod> Methods { get; private set; }
     }
 }
