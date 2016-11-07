@@ -78,7 +78,7 @@ namespace Surpass.Utils.Net.Http
             IDictionary<string, string> requestDictionary,
             Encoding encoding = null)
         {
-            ExceptionUtils.CheckNotNullOrWhiteSpace(url, nameof(url));
+            ExceptionUtils.CheckNotNullOrNotWhiteSpace(url, nameof(url));
             return await Task.Run<HttpWebResponse>(() =>
             {
                 return Post(url, requestDictionary, encoding);
@@ -95,7 +95,7 @@ namespace Surpass.Utils.Net.Http
         public static async Task<string> PostStringAsync(string url, IDictionary<string, string> requestDictionary,
             Encoding encoding = null)
         {
-            ExceptionUtils.CheckNotNullOrWhiteSpace(url, nameof(url));
+            ExceptionUtils.CheckNotNullOrNotWhiteSpace(url, nameof(url));
             return await Task.Run<string>(() =>
             {
                 return PostString(url, requestDictionary, encoding);
@@ -112,7 +112,7 @@ namespace Surpass.Utils.Net.Http
         public static string PostString(string url, IDictionary<string, string> requestDictionary,
             Encoding encoding = null)
         {
-            ExceptionUtils.CheckNotNullOrWhiteSpace(url, nameof(url));
+            ExceptionUtils.CheckNotNullOrNotWhiteSpace(url, nameof(url));
             HttpClient client = new HttpClient();
             if (encoding != null)
             {
@@ -132,7 +132,7 @@ namespace Surpass.Utils.Net.Http
         public static HttpWebResponse Post(string url, IDictionary<string, string> requestDictionary,
             Encoding encoding = null)
         {
-            ExceptionUtils.CheckNotNullOrWhiteSpace(url, nameof(url));
+            ExceptionUtils.CheckNotNullOrNotWhiteSpace(url, nameof(url));
             HttpClient client = new HttpClient();
             if (encoding != null)
             {
@@ -152,7 +152,7 @@ namespace Surpass.Utils.Net.Http
             IDictionary<string, string> requestDictionary,
             Encoding encoding = null)
         {
-            ExceptionUtils.CheckNotNullOrWhiteSpace(url, nameof(url));
+            ExceptionUtils.CheckNotNullOrNotWhiteSpace(url, nameof(url));
             return await Task.Run<string>(() =>
             {
                 return GetString(url, requestDictionary, encoding);
@@ -170,7 +170,7 @@ namespace Surpass.Utils.Net.Http
             IDictionary<string, string> requestDictionary,
             Encoding encoding = null)
         {
-            ExceptionUtils.CheckNotNullOrWhiteSpace(url, nameof(url));
+            ExceptionUtils.CheckNotNullOrNotWhiteSpace(url, nameof(url));
             return await Task.Run<HttpWebResponse>(() =>
             {
                 return Get(url, requestDictionary, encoding);
@@ -208,7 +208,7 @@ namespace Surpass.Utils.Net.Http
             IDictionary<string, string> requestDictionary,
             Encoding encoding = null)
         {
-            ExceptionUtils.CheckNotNullOrWhiteSpace(url, nameof(url));
+            ExceptionUtils.CheckNotNullOrNotWhiteSpace(url, nameof(url));
             HttpClient client = new HttpClient();
             if (encoding != null)
             {

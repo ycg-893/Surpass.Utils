@@ -168,7 +168,7 @@ namespace Surpass.Utils.DataResult
         /// <returns></returns>
         public static List<TResult> ToFixedSqlList<TResult>(string sql, IDataReader dataReader)
         {
-            ExceptionUtils.CheckNotNullAndWhiteSpace(sql, nameof(sql));
+            ExceptionUtils.CheckNotNullOrNotWhiteSpace(sql, nameof(sql));
             ExceptionUtils.CheckNotNull(dataReader, nameof(dataReader));
             Func<IDataResult, TResult> fun = AObjectDataResult.DataReaderFixedSqlFunResult<TResult>(sql, dataReader);
             return ToList(fun, dataReader);
@@ -225,7 +225,7 @@ namespace Surpass.Utils.DataResult
         /// <returns></returns>
         public static List<TResult> ToFixedSqlList<TResult>(string sql, DataTable dataTable)
         {
-            ExceptionUtils.CheckNotNullAndWhiteSpace(sql, nameof(sql));
+            ExceptionUtils.CheckNotNullOrNotWhiteSpace(sql, nameof(sql));
             ExceptionUtils.CheckNotNull(dataTable, nameof(dataTable));
             Func<IDataResult, TResult> fun = AObjectDataResult.DataTableFixedSqlFunResult<TResult>(sql, dataTable);
             return ToList(fun, dataTable);

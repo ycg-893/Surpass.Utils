@@ -36,7 +36,7 @@ namespace Surpass.Utils
         /// <param name="value">值</param>
         /// <param name="name">名称</param>
         /// <returns></returns>
-        public static string CheckNotNullAndWhiteSpace(string value, string name)
+        public static string CheckNotNullOrNotWhiteSpace(string value, string name)
         {
             CheckNotNull(value, name);
             if (string.IsNullOrWhiteSpace(value))

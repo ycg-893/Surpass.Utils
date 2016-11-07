@@ -246,7 +246,7 @@ namespace Surpass.Utils.Net.Http
         public async Task<HttpWebResponse> GetAsync(string requestUrl,
            IDictionary<string, string> requestDictionary)
         {
-            ExceptionUtils.CheckNotNullAndWhiteSpace(requestUrl, nameof(requestUrl));
+            ExceptionUtils.CheckNotNullOrNotWhiteSpace(requestUrl, nameof(requestUrl));
             return await Task.Run<HttpWebResponse>(() =>
             {
                 return Get(requestUrl, requestDictionary);
@@ -261,7 +261,7 @@ namespace Surpass.Utils.Net.Http
         /// <returns></returns>
         public HttpWebResponse Get(string requestUrl, IDictionary<string, string> requestDictionary)
         {
-            ExceptionUtils.CheckNotNullAndWhiteSpace(requestUrl, nameof(requestUrl));
+            ExceptionUtils.CheckNotNullOrNotWhiteSpace(requestUrl, nameof(requestUrl));
             var requestData = this.RequestString(requestDictionary, true);
             requestUrl = requestUrl.Trim();
             Uri url = new Uri(requestUrl + (requestData.Length == 0 || requestUrl.Substring(requestUrl.Length - 1) == "?" ? "" : "?") + requestData);
@@ -342,7 +342,7 @@ namespace Surpass.Utils.Net.Http
         /// <returns></returns>
         public async Task<HttpWebResponse> PostAsync(string requestUrl, IDictionary<string, string> requestDictionary)
         {
-            ExceptionUtils.CheckNotNullAndWhiteSpace(requestUrl, nameof(requestUrl));
+            ExceptionUtils.CheckNotNullOrNotWhiteSpace(requestUrl, nameof(requestUrl));
             return await Task.Run<HttpWebResponse>(() =>
             {
                 return Post(requestUrl, requestDictionary);
@@ -357,7 +357,7 @@ namespace Surpass.Utils.Net.Http
         /// <returns></returns>
         public HttpWebResponse Post(string requestUrl, IDictionary<string, string> requestDictionary)
         {
-            ExceptionUtils.CheckNotNullAndWhiteSpace(requestUrl, nameof(requestUrl));
+            ExceptionUtils.CheckNotNullOrNotWhiteSpace(requestUrl, nameof(requestUrl));
             return Post(new Uri(requestUrl), requestDictionary);
         }
 
