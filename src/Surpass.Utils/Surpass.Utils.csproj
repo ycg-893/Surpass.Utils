@@ -71,7 +71,9 @@
     <Compile Include="Exceptions\ArgumentWhiteSpaceException.cs" />
     <Compile Include="ExceptionUtils.cs" />
     <Compile Include="Extensions\AssemblyExtension.cs" />
+    <Compile Include="Extensions\CollectionExtensions.cs" />
     <Compile Include="Extensions\DataExtensions.cs" />
+    <Compile Include="Extensions\DictionaryExtensions.cs" />
     <Compile Include="Extensions\MemberExtension.cs" />
     <Compile Include="Extensions\StringExtension.cs" />
     <Compile Include="Extensions\StructExtension.cs" />
