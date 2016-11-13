@@ -44,7 +44,27 @@ namespace Surpass.Utils
                 throw new ArgumentWhiteSpaceException(name);
             }
             return value;
-        }       
-       
+        }
+
+        /// <summary>
+        /// 数据格式不正确异常
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public static FormatException ThrowFormatException(string message)
+        {
+            throw new FormatException(message);
+        }
+
+        /// <summary>
+        /// 由于不支持而抛出的异常
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public static NotSupportedException ThrowNotSupportedException(string message)
+        {
+            throw new NotSupportedException(message);
+        }
+
     }
 }
