@@ -160,13 +160,20 @@ namespace System.Threading.Tasks
             {
                 TryDequeue(task);
             }
-            try
+            lock (tasks)
             {
-                return base.TryExecuteTask(task);
-            }
-            finally
-            {
-                Interlocked.Decrement(ref runningTaskCount);
+                bool isRemove = tasks.Remove(task);
+                try
+                {
+                    return base.TryExecuteTask(task);
+                }
+                finally
+                {
+                    if (isRemove)
+                    {
+                        Interlocked.Decrement(ref runningTaskCount);
+                    }
+                }
             }
         }
 
