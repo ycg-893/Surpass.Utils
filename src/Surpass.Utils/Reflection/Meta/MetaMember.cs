@@ -95,6 +95,55 @@ namespace Surpass.Utils.Reflection.Meta
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private DisplayAttribute _DisplayAttribute = null;
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool isReadDisplayAttribute = false;
+
+        /// <summary>
+        /// 获取友好特性
+        /// </summary>
+        public DisplayAttribute DisplayAttribute
+        {
+            get
+            {
+                if (!isReadDisplayAttribute)
+                {
+                    lock (this)
+                    {
+                        if (!isReadDisplayAttribute)
+                        {
+                            var item = CustomAttributes.FirstOrDefault(s => s is DisplayAttribute);
+                            if (item != null)
+                            {
+                                _DisplayAttribute = item as DisplayAttribute;
+                            }
+                            isReadDisplayAttribute = true;
+                        }
+                    }
+                }
+                return _DisplayAttribute;
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private ICollection<ValidationAttribute> _validationAttributes = null;
+
+        /// <summary>
+        /// 获取验证特性集合
+        /// </summary>
+        public ICollection<ValidationAttribute> ValidationAttributes
+        {
+            get
+            {
+                return this.GetRefField<ICollection<ValidationAttribute>>(ref this._validationAttributes, () =>
+                {
+                    return CustomAttributes.Where(s => s is ValidationAttribute).Cast<ValidationAttribute>().ToList().AsReadOnly();
+                });
+            }
+        }
+
         /// <summary>
         /// 输出成员名称
         /// </summary>

@@ -16,7 +16,10 @@ namespace Surpass.Utils.Net.Http
     /// </summary>
     public class HttpClient
     {
-        private static string default_ContentType = "application/x-www-form-urlencoded";
+        /// <summary>
+        /// 默认 ContentType 类型
+        /// </summary>
+        public static string default_ContentType { get; set; } = "application/x-www-form-urlencoded";
 
         /// <summary>
         /// 静态实例化

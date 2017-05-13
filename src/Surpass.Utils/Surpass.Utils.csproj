@@ -102,6 +102,8 @@
     <Compile Include="Security\RsaFromPkcs8Utils.cs" />
     <Compile Include="Security\SignDictionary.cs" />
     <Compile Include="Tasks\TaskSchedulerQueue.cs" />
+    <Compile Include="Validations\MobilePhoneAttribute.cs" />
+    <Compile Include="Validations\ValidationManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">

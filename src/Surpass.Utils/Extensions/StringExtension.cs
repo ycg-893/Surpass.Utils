@@ -480,6 +480,5 @@ namespace Surpass.Utils
             }
             return char.ToUpper(value[0], culture) + value.Substring(1);
         }
-
     }
 }

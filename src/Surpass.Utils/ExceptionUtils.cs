@@ -2,6 +2,7 @@
 using Surpass.Utils.Properties;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -66,5 +67,14 @@ namespace Surpass.Utils
             throw new NotSupportedException(message);
         }
 
+        /// <summary>
+        /// 抛出验证性异常
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public static ValidationException ThrowValidationException(string message)
+        {
+            throw new ValidationException(message);
+        }
     }
 }
