@@ -1,16 +1,8 @@
 ﻿using NUnit.Framework;
-using Surpass.Utils.Net;
-using Surpass.Utils.Net.Http;
-using Surpass.Utils.Reflection;
 using Surpass.Utils.Reflection.Meta;
 using Surpass.Utils.Test.Entities;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Surpass.Utils.Test.Reflection
 {

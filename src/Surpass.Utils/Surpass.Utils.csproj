@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Surpass.Utils</RootNamespace>
     <AssemblyName>Surpass.Utils</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -49,7 +49,6 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
@@ -98,10 +97,13 @@
     <Compile Include="Reflection\Meta\MetaReadWriteMember.cs" />
     <Compile Include="Reflection\Meta\TypeKey.cs" />
     <Compile Include="Reflection\MethodFactory.cs" />
+    <Compile Include="Reflection\ReflectionUtils.cs" />
     <Compile Include="Security\Md5Utils.cs" />
     <Compile Include="Security\RsaFromPkcs8Utils.cs" />
     <Compile Include="Security\SignDictionary.cs" />
     <Compile Include="Tasks\TaskSchedulerQueue.cs" />
+    <Compile Include="TaskUtils.cs" />
+    <Compile Include="Utils\TypeUtils.cs" />
     <Compile Include="Validations\MobilePhoneAttribute.cs" />
     <Compile Include="Validations\ValidationManager.cs" />
   </ItemGroup>

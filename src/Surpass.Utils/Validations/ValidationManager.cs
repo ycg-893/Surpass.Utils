@@ -1,4 +1,5 @@
-﻿using Surpass.Utils.Reflection.Meta;
+﻿using Surpass.Utils.Reflection;
+using Surpass.Utils.Reflection.Meta;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -16,9 +17,6 @@ namespace Surpass.Utils.Validations
     /// </summary>
     public static class ValidationManager
     {
-        private static ConcurrentDictionary<Type, ISet<MetaProperty>> Validations =
-            new ConcurrentDictionary<Type, ISet<MetaProperty>>();
-
         /// <summary>
         /// 验证对象
         /// </summary>
@@ -30,64 +28,46 @@ namespace Surpass.Utils.Validations
                 return;
             }
             Type type = instance.GetType();
-            Lazy<ISet<MetaProperty>> lazy = null;
-            ISet<MetaProperty> metaPropertys = Validations.GetOrAdd(type, (t) =>
-            {
-                if (lazy == null)
-                {
-                    lazy = GetLazy(t);
-                }
-                return lazy.Value;
-            });
-            Validate(instance, metaPropertys);
+            var metaPropertys = ReflectionUtils.GetMetaPropertys(type);
+            Validate(metaPropertys, instance);
         }
 
-        private static Lazy<ISet<MetaProperty>> GetLazy(Type type)
+        /// <summary>
+        /// 验证对象
+        /// </summary>
+        /// <param name="metaPropertys">元属性集合</param>
+        /// <param name="instance">实例</param>
+        public static void Validate(ISet<MetaProperty> metaPropertys, object instance)
         {
-            return new Lazy<ISet<MetaProperty>>(() =>
+            if (metaPropertys == null || instance == null)
             {
-                return GetMetaPropertys(type);
-            });
-        }
-
-        private static void Validate(object instance, ISet<MetaProperty> metaPropertys)
-        {
+                return;
+            }
             foreach (MetaProperty p in metaPropertys)
             {
-                object value = p.GetValue(instance);
-                ValidationContext context = new ValidationContext(instance)
+                if (p.MemberInfo.CanRead)
                 {
-                    DisplayName = p.DisplayAttribute != null ? p.DisplayAttribute.Name : p.MemberInfo.Name,
-                    MemberName = p.MemberInfo.Name
-                };
-                foreach (var va in p.ValidationAttributes)
-                {
-                    va.Validate(value, context);
+                    object value = p.GetValue(instance);
+                    var context = new ValidationContext(instance, null, null)
+                    {
+                        DisplayName = p.DisplayAttribute != null ? p.DisplayAttribute.Name : p.MemberInfo.Name,
+                        MemberName = p.MemberInfo.Name
+                    };
+                    foreach (var va in p.ValidationAttributes)
+                    {
+                        va.Validate(value, context);
+                    }
                 }
             }
             if (instance is IValidatableObject)
             {
                 IValidatableObject validatable = (IValidatableObject)instance;
-                var validationResult = validatable.Validate(new ValidationContext(instance)).FirstOrDefault();
+                var validationResult = validatable.Validate(new ValidationContext(instance, null, null)).FirstOrDefault();
                 if (validationResult != null)
                 {
-                    throw new System.ComponentModel.DataAnnotations.ValidationException(validationResult.ErrorMessage);
+                    throw new ValidationException(validationResult.ErrorMessage);
                 }
             }
-        }
-
-        private static ISet<MetaProperty> GetMetaPropertys(Type type)
-        {
-            ISet<MetaProperty> metaPropertys = new HashSet<MetaProperty>();
-            var ps = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
-            foreach (var p in ps)
-            {
-                if (p.CanRead && p.IsDefined(typeof(ValidationAttribute), true))
-                {
-                    metaPropertys.Add(new MetaProperty(p));
-                }
-            }
-            return metaPropertys;
         }
     }
 }

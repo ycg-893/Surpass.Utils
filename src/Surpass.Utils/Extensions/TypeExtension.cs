@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -13,6 +14,27 @@ namespace Surpass.Utils
     /// </summary>
     public static class TypeExtension
     {
+
+        /// <summary>
+        /// 获取或创建委托
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static Func<object> GetOrCreateDelegate(this Type type)
+        {
+            return TypeUtils.GetOrCreateDelegate(type);
+        }
+
+        /// <summary>
+        /// 创建实例
+        /// </summary>
+        /// <param name="type">类型</param>
+        /// <returns></returns>
+        public static object CreateInstance(this Type type)
+        {
+            return TypeUtils.CreateInstance(type);
+        }
+
         /// <summary>
         /// 是否是整数DbType类型(Int32、UInt32、Int64、UInt64、Int16、UInt16、Byte、SByte)
         /// </summary>

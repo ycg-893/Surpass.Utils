@@ -193,9 +193,9 @@ namespace Surpass.Utils.Net.Http
         /// </summary>
         /// <param name="requestUrl">requestUrl地址</param>           
         /// <returns></returns>
-        public async Task<string> GetStringAsync(Uri requestUrl)
+        public Task<string> GetStringAsync(Uri requestUrl)
         {
-            return await Task.Run<string>(() =>
+            return TaskUtils.Run<string>(() =>
             {
                 return GetString(requestUrl);
             });
@@ -218,10 +218,10 @@ namespace Surpass.Utils.Net.Http
         /// <param name="requestUrl">requestUrl地址</param>
         /// <param name="requestDictionary">请求字典</param>       
         /// <returns></returns>
-        public async Task<string> GetStringAsync(string requestUrl,
+        public Task<string> GetStringAsync(string requestUrl,
             IDictionary<string, string> requestDictionary)
         {
-            return await Task.Run<string>(() =>
+            return TaskUtils.Run<string>(() =>
             {
                 return GetString(requestUrl, requestDictionary);
             });
@@ -246,11 +246,11 @@ namespace Surpass.Utils.Net.Http
         /// <param name="requestUrl">requestUrl地址</param>
         /// <param name="requestDictionary">请求字典</param>
         /// <returns></returns>
-        public async Task<HttpWebResponse> GetAsync(string requestUrl,
+        public Task<HttpWebResponse> GetAsync(string requestUrl,
            IDictionary<string, string> requestDictionary)
         {
             ExceptionUtils.CheckNotNullOrNotWhiteSpace(requestUrl, nameof(requestUrl));
-            return await Task.Run<HttpWebResponse>(() =>
+            return TaskUtils.Run<HttpWebResponse>(() =>
             {
                 return Get(requestUrl, requestDictionary);
             });
@@ -276,10 +276,10 @@ namespace Surpass.Utils.Net.Http
         /// </summary>
         /// <param name="requestUrl">requestUrl地址</param>     
         /// <returns></returns>
-        public async Task<HttpWebResponse> GetAsync(Uri requestUrl)
+        public Task<HttpWebResponse> GetAsync(Uri requestUrl)
         {
             ExceptionUtils.CheckNotNull(requestUrl, nameof(requestUrl));
-            return await Task.Run<HttpWebResponse>(() =>
+            return TaskUtils.Run<HttpWebResponse>(() =>
             {
                 return Get(requestUrl);
             });
@@ -291,9 +291,9 @@ namespace Surpass.Utils.Net.Http
         /// <param name="requestUrl">requestUrl地址</param>
         /// <param name="requestDictionary">请求字典</param>       
         /// <returns></returns>
-        public async Task<string> PostStringAsync(string requestUrl, IDictionary<string, string> requestDictionary)
+        public Task<string> PostStringAsync(string requestUrl, IDictionary<string, string> requestDictionary)
         {
-            return await Task.Run<string>(() =>
+            return TaskUtils.Run<string>(() =>
             {
                 return PostString(requestUrl, requestDictionary);
             });
@@ -305,9 +305,9 @@ namespace Surpass.Utils.Net.Http
         /// <param name="requestUrl">requestUrl地址</param>
         /// <param name="requestDictionary">请求字典</param>       
         /// <returns></returns>
-        public async Task<string> PostStringAsync(Uri requestUrl, IDictionary<string, string> requestDictionary)
+        public Task<string> PostStringAsync(Uri requestUrl, IDictionary<string, string> requestDictionary)
         {
-            return await Task.Run<string>(() =>
+            return TaskUtils.Run<string>(() =>
             {
                 return PostString(requestUrl, requestDictionary);
             });
@@ -343,10 +343,10 @@ namespace Surpass.Utils.Net.Http
         /// <param name="requestUrl">requestUrl地址</param>
         /// <param name="requestDictionary">请求字典</param>       
         /// <returns></returns>
-        public async Task<HttpWebResponse> PostAsync(string requestUrl, IDictionary<string, string> requestDictionary)
+        public Task<HttpWebResponse> PostAsync(string requestUrl, IDictionary<string, string> requestDictionary)
         {
             ExceptionUtils.CheckNotNullOrNotWhiteSpace(requestUrl, nameof(requestUrl));
-            return await Task.Run<HttpWebResponse>(() =>
+            return TaskUtils.Run<HttpWebResponse>(() =>
             {
                 return Post(requestUrl, requestDictionary);
             });
@@ -370,10 +370,10 @@ namespace Surpass.Utils.Net.Http
         /// <param name="requestUrl">requestUrl地址</param>
         /// <param name="requestDictionary">请求字典</param>       
         /// <returns></returns>
-        public async Task<HttpWebResponse> PostAsync(Uri requestUrl, IDictionary<string, string> requestDictionary)
+        public Task<HttpWebResponse> PostAsync(Uri requestUrl, IDictionary<string, string> requestDictionary)
         {
             ExceptionUtils.CheckNotNull(requestUrl, nameof(requestUrl));
-            return await Task.Run<HttpWebResponse>(() =>
+            return TaskUtils.Run<HttpWebResponse>(() =>
             {
                 return Post(requestUrl, requestDictionary);
             });
@@ -408,12 +408,39 @@ namespace Surpass.Utils.Net.Http
         /// <returns></returns>
         public HttpWebResponse Post(Uri requestUrl, IDictionary<string, string> requestDictionary)
         {
-            ExceptionUtils.CheckNotNull(requestUrl, nameof(requestUrl));
             var requestData = RequestString(requestDictionary, false);
+            return Post(requestUrl, requestData);
+        }
+
+        /// <summary>
+        /// Http Post 字符响应请求
+        /// </summary>
+        /// <param name="requestUrl">requestUrl地址</param>
+        /// <param name="requestData">请求数据</param>       
+        /// <returns></returns>
+        public string PostString(string requestUrl, string requestData)
+        {
+            var response = Post(new Uri(requestUrl), requestData);
+            return response.ResponseStringResult(this.Encoding);
+        }
+
+        /// <summary>
+        /// Http Post 请求
+        /// </summary>
+        /// <param name="requestUrl">requestUrl地址</param>
+        /// <param name="requestData">请求数据</param>       
+        /// <returns></returns>
+        public HttpWebResponse Post(Uri requestUrl, string requestData)
+        {
+            ExceptionUtils.CheckNotNull(requestUrl, nameof(requestUrl));
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(requestUrl);
             request.ProtocolVersion = this.ProtocolVersion;
             request.Method = "POST";
             SetRequest(request);
+            if (requestData == null)
+            {
+                requestData = "";
+            }
             byte[] bytes = this.Encoding.GetBytes(requestData);
             request.ContentLength = bytes.Length;
             using (Stream requestStream = request.GetRequestStream())

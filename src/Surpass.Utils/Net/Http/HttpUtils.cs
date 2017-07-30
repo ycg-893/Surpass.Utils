@@ -21,10 +21,10 @@ namespace Surpass.Utils.Net.Http
         /// <param name="response">响应</param>
         /// <param name="encoding">编码</param>
         /// <returns></returns>
-        public static async Task<string> ResponseStringResultAsync(this HttpWebResponse response,
+        public static Task<string> ResponseStringResultAsync(this HttpWebResponse response,
             Encoding encoding = null)
         {
-            return await Task.Run<string>(() =>
+            return TaskUtils.Run<string>(() =>
             {
                 return ResponseStringResult(response, encoding);
             });
@@ -74,12 +74,12 @@ namespace Surpass.Utils.Net.Http
         /// <param name="requestDictionary">请求字典</param>  
         /// <param name="encoding">编码</param>     
         /// <returns></returns>
-        public static async Task<HttpWebResponse> PostAsync(string url,
+        public static Task<HttpWebResponse> PostAsync(string url,
             IDictionary<string, string> requestDictionary,
             Encoding encoding = null)
         {
             ExceptionUtils.CheckNotNullOrNotWhiteSpace(url, nameof(url));
-            return await Task.Run<HttpWebResponse>(() =>
+            return TaskUtils.Run<HttpWebResponse>(() =>
             {
                 return Post(url, requestDictionary, encoding);
             });
@@ -92,11 +92,11 @@ namespace Surpass.Utils.Net.Http
         /// <param name="requestDictionary">请求字典</param>   
         /// <param name="encoding">编码</param>   
         /// <returns></returns>
-        public static async Task<string> PostStringAsync(string url, IDictionary<string, string> requestDictionary,
+        public static Task<string> PostStringAsync(string url, IDictionary<string, string> requestDictionary,
             Encoding encoding = null)
         {
             ExceptionUtils.CheckNotNullOrNotWhiteSpace(url, nameof(url));
-            return await Task.Run<string>(() =>
+            return TaskUtils.Run<string>(() =>
             {
                 return PostString(url, requestDictionary, encoding);
             });
@@ -148,12 +148,12 @@ namespace Surpass.Utils.Net.Http
         /// <param name="requestDictionary">请求字典</param>      
         /// <param name="encoding">编码</param>   
         /// <returns></returns>
-        public static async Task<string> GetStringAsync(string url,
+        public static Task<string> GetStringAsync(string url,
             IDictionary<string, string> requestDictionary,
             Encoding encoding = null)
         {
             ExceptionUtils.CheckNotNullOrNotWhiteSpace(url, nameof(url));
-            return await Task.Run<string>(() =>
+            return TaskUtils.Run<string>(() =>
             {
                 return GetString(url, requestDictionary, encoding);
             });
@@ -166,12 +166,12 @@ namespace Surpass.Utils.Net.Http
         /// <param name="requestDictionary">请求字典</param>      
         /// <param name="encoding">编码</param>   
         /// <returns></returns>
-        public static async Task<HttpWebResponse> GetAsync(string url,
+        public static Task<HttpWebResponse> GetAsync(string url,
             IDictionary<string, string> requestDictionary,
             Encoding encoding = null)
         {
             ExceptionUtils.CheckNotNullOrNotWhiteSpace(url, nameof(url));
-            return await Task.Run<HttpWebResponse>(() =>
+            return TaskUtils.Run<HttpWebResponse>(() =>
             {
                 return Get(url, requestDictionary, encoding);
             });
